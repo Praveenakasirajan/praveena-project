@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Coach — Intelligent Interview Preparation</title>
+    <meta name="description" content="AI Interview Coach provides structured interview practice across Technical, HR, Behavioral, and Resume modes with speech transcription, computer-vision video analysis, and deterministic readiness scoring.">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- ================================================================
+         1. TOP NAVIGATION BAR
+         ================================================================ -->
+    <header class="app-header">
+        <div class="nav-container">
+            <div class="brand" id="brandLogo" style="cursor: pointer;">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                        <path d="M12 6a4 4 0 0 0-4 4h2a2 2 0 1 1 4 0c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z"/>
+                        <circle cx="12" cy="17" r="1"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">AI Interview Coach</span>
+                    <span class="brand-badge">PRO</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links">
+                <button class="nav-link active" id="navDashboardBtn">Dashboard</button>
+                <button class="nav-link" id="navSetupBtn">Practice</button>
+                <button class="nav-link" id="navResumeBtn">Resume</button>
+                <button class="nav-link" id="navHistoryBtn">History</button>
+            </nav>
+
+            <!-- Authentication Area -->
+            <div class="nav-auth" id="navAuthArea">
+                <div id="unauthArea" class="auth-btn-group">
+                    <button class="btn btn-outline" id="openLoginBtn">Sign In</button>
+                    <button class="btn btn-primary" id="openRegisterBtn">Register</button>
+                </div>
+                <div id="authArea" class="user-profile-badge" style="display: none;">
+                    <div class="user-avatar" id="navUserInitial">U</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="navUserName">Candidate</span>
+                        <span class="user-status">Online</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline btn-logout" id="logoutBtn" title="Sign Out">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================================================================
+         MAIN APPLICATION VIEWS
+         ================================================================ -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- ============================================================
+                 VIEW 1: DASHBOARD
+                 ============================================================ -->
+            <section id="viewDashboard" class="app-view active-view">
+                <!-- Hero Banner -->
+                <div class="welcome-banner">
+                    <div class="banner-content">
+                        <span class="banner-pill">Interview Preparation Hub</span>
+                        <h1 id="dashboardGreeting">Welcome back, Candidate</h1>
+                        <p class="banner-subtitle">
+                            Prepare for interviews with objective evaluation. Choose your interview mode, practice focused technical domains, and receive verifiable communication and video metrics.
+                        </p>
+                        <div class="banner-actions">
+                            <button class="btn btn-primary btn-lg" id="dashboardStartBtn">
+                                🚀 Start Interview
+                            </button>
+                            <button class="btn btn-secondary btn-lg" id="dashboardViewHistoryBtn">
+                                📊 View History & Scores
+                            </button>
+                        </div>
+                    </div>
+                    <div class="banner-stat-card">
+                        <div class="readiness-gauge">
+                            <span class="gauge-label">Readiness Score</span>
+                            <div class="gauge-number" id="dashReadinessScore">--</div>
+                            <span class="gauge-level" id="dashReadinessLevel">No Sessions Yet</span>
+                        </div>
+                        <p class="gauge-caption" id="dashReadinessCaption">Complete an interview session to compute your readiness score.</p>
+                    </div>
+                </div>
+
+                <!-- Stats Overview Row -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon--violet">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Interviews Completed</span>
+                            <span class="stat-val" id="dashTotalSessions">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon--teal">📈</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Average Score</span>
+                            <span class="stat-val" id="dashAvgScore">--</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon--blue">💼</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Target Role</span>
+                            <span class="stat-val" id="dashTargetRole">Optional (None)</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon--amber">⏱️</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Average Speech Pace</span>
+                            <span class="stat-val" id="dashAvgWpm">-- WPM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two-Column Layout: Resume Insights & Recommended Practice -->
+                <div class="dashboard-split-grid">
+                    <!-- Left: Resume Insights Card -->
+                    <div class="section-card" id="dashResumeCard">
+                        <div class="section-header">
+                            <div>
+                                <h2>Resume Insights</h2>
+                                <span class="section-subtitle" id="dashResumeSub">Upload your resume to extract skills, strengths, and role alignment</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline" id="dashManageResumeBtn">Upload Resume</button>
+                        </div>
+                        <div class="resume-insights-body">
+                            <div class="insight-block">
+                                <span class="insight-label">Detected Skills:</span>
+                                <div id="dashResumeSkillsTags" class="tag-cloud">
+                                    <span class="tag-empty">No resume uploaded yet.</span>
+                                </div>
+                            </div>
+                            <div class="insight-block">
+                                <span class="insight-label">Resume Strengths:</span>
+                                <ul id="dashResumeStrengths" class="insight-list">
+                                    <li class="text-secondary">Upload a PDF or DOCX resume to view key strengths.</li>
+                                </ul>
+                            </div>
+                            <div class="insight-block">
+                                <span class="insight-label">Potential Skill Gaps (Role-Aware):</span>
+                                <ul id="dashResumeGaps" class="insight-list">
+                                    <li class="text-secondary">Skill gaps will be analyzed against your selected target role.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Recommended Practice -->
+                    <div class="section-card" id="dashRecommendedPractice">
+                        <div class="section-header">
+                            <div>
+                                <h2>Recommended Practice</h2>
+                                <span class="section-subtitle">Targeted suggestions based on your performance</span>
+                            </div>
+                        </div>
+                        <div class="rec-practice-body">
+                            <div class="rec-practice-card">
+                                <div class="rec-badge" id="dashRecBadge">Technical Domain</div>
+                                <h3 id="dashRecTitle">Practice Core Java</h3>
+                                <p id="dashRecDesc">Deepen your understanding of Collections, JVM memory model, and multithreading concepts.</p>
+                                <button class="btn btn-primary btn-sm" id="dashRecStartBtn">Practice Now →</button>
+                            </div>
+                            <div class="rec-practice-tips">
+                                <strong>💡 Preparation Tip:</strong>
+                                <span>Try single-question practice (1 Question) for fast technical self-assessment.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Interview Modes Showcase -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2>Interview Modes</h2>
+                        <span class="section-subtitle">Select an interview style tailored to your preparation</span>
+                    </div>
+                    <div class="modes-grid">
+                        <div class="mode-tile" data-mode="Technical">
+                            <div class="mode-icon">💻</div>
+                            <h3>Technical</h3>
+                            <p>Domain-specific questions in Java, Python, C++, DSA, DBMS/SQL, OS, CN, and System Design.</p>
+                            <span class="mode-tag">Domain Specific</span>
+                        </div>
+                        <div class="mode-tile" data-mode="HR">
+                            <div class="mode-icon">🤝</div>
+                            <h3>HR</h3>
+                            <p>Self-introduction, strengths, career aspirations, teamwork, adaptability, and workplace situations.</p>
+                            <span class="mode-tag">Culture & Fit</span>
+                        </div>
+                        <div class="mode-tile" data-mode="Behavioral">
+                            <div class="mode-icon">⭐</div>
+                            <h3>Behavioral</h3>
+                            <p>Situation-based challenges evaluated on context, reasoning, actions, and outcomes.</p>
+                            <span class="mode-tag">STAR Analysis</span>
+                        </div>
+                        <div class="mode-tile" data-mode="Resume-Based">
+                            <div class="mode-icon">📄</div>
+                            <h3>Resume-Based</h3>
+                            <p>Questions strictly grounded in your verified projects, technical skills, and internship experience.</p>
+                            <span class="mode-tag">Resume Grounded</span>
+                        </div>
+                        <div class="mode-tile" data-mode="Mixed">
+                            <div class="mode-icon">⚡</div>
+                            <h3>Mixed</h3>
+                            <p>A balanced interview simulation combining Technical, HR, Behavioral, and Resume questions.</p>
+                            <span class="mode-tag">Full Simulation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Interviews -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2>Recent Interviews</h2>
+                        <button class="btn btn-sm btn-outline" id="dashSeeAllHistoryBtn">See All History →</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="dashRecentTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Mode</th>
+                                    <th>Domain / Role</th>
+                                    <th>Questions</th>
+                                    <th>Score</th>
+                                    <th>Readiness</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashRecentTbody">
+                                <tr>
+                                    <td colspan="8" class="empty-state">No interview sessions found. Click "Start Interview" above to begin.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 2: STEP-BASED INTERVIEW SETUP
+                 ============================================================ -->
+            <section id="viewSetup" class="app-view">
+                <div class="page-title-row">
+                    <div>
+                        <h2>Interview Setup</h2>
+                        <p class="text-secondary">Configure your interview mode, technical subject, questions count, and resume</p>
+                    </div>
+                    <button class="btn btn-outline" id="setupBackDashBtn">← Back to Dashboard</button>
+                </div>
+
+                <!-- Step Stepper Indicators -->
+                <div class="wizard-stepper">
+                    <div class="step-indicator active" id="stepInd1" data-step="1">
+                        <span class="step-num">1</span>
+                        <span class="step-label">Interview Mode</span>
+                    </div>
+                    <div class="step-indicator" id="stepInd2" data-step="2">
+                        <span class="step-num">2</span>
+                        <span class="step-label">Domain & Role</span>
+                    </div>
+                    <div class="step-indicator" id="stepInd3" data-step="3">
+                        <span class="step-num">3</span>
+                        <span class="step-label">Questions</span>
+                    </div>
+                    <div class="step-indicator" id="stepInd4" data-step="4">
+                        <span class="step-num">4</span>
+                        <span class="step-label">Resume</span>
+                    </div>
+                    <div class="step-indicator" id="stepInd5" data-step="5">
+                        <span class="step-num">5</span>
+                        <span class="step-label">Review & Start</span>
+                    </div>
+                </div>
+
+                <!-- Setup Wizard Content Cards -->
+                <div class="wizard-container card">
+
+                    <!-- STEP 1: INTERVIEW MODE -->
+                    <div class="wizard-step active" id="wizardStep1">
+                        <div class="step-heading">
+                            <h3>Step 1: Select Interview Mode</h3>
+                            <p class="text-secondary">Interview Mode is the primary context for question generation.</p>
+                        </div>
+                        <div class="step-mode-selection-grid">
+                            <label class="mode-select-card selected" data-mode-val="Technical">
+                                <input type="radio" name="interviewModeRadio" value="Technical" checked style="display: none;">
+                                <div class="m-card-icon">💻</div>
+                                <div class="m-card-content">
+                                    <h4>Technical</h4>
+                                    <p>Core programming languages, DSA, DBMS, System Design, and CS concepts.</p>
+                                </div>
+                            </label>
+                            <label class="mode-select-card" data-mode-val="HR">
+                                <input type="radio" name="interviewModeRadio" value="HR" style="display: none;">
+                                <div class="m-card-icon">🤝</div>
+                                <div class="m-card-content">
+                                    <h4>HR</h4>
+                                    <p>Self-introduction, strengths, weaknesses, teamwork, adaptability, and fit.</p>
+                                </div>
+                            </label>
+                            <label class="mode-select-card" data-mode-val="Behavioral">
+                                <input type="radio" name="interviewModeRadio" value="Behavioral" style="display: none;">
+                                <div class="m-card-icon">⭐</div>
+                                <div class="m-card-content">
+                                    <h4>Behavioral</h4>
+                                    <p>Situation-based questions evaluating actions, reasoning, and problem solving.</p>
+                                </div>
+                            </label>
+                            <label class="mode-select-card" data-mode-val="Resume-Based">
+                                <input type="radio" name="interviewModeRadio" value="Resume-Based" style="display: none;">
+                                <div class="m-card-icon">📄</div>
+                                <div class="m-card-content">
+                                    <h4>Resume-Based</h4>
+                                    <p>Questions grounded strictly in your uploaded resume projects and skills.</p>
+                                </div>
+                            </label>
+                            <label class="mode-select-card" data-mode-val="Mixed">
+                                <input type="radio" name="interviewModeRadio" value="Mixed" style="display: none;">
+                                <div class="m-card-icon">⚡</div>
+                                <div class="m-card-content">
+                                    <h4>Mixed</h4>
+                                    <p>A balanced mix across Technical, HR, Behavioral, and Resume topics.</p>
+                                </div>
+                            </label>
+                        </div>
+                        <input type="hidden" id="setupModeSelect" value="Technical">
+
+                        <div class="wizard-nav-row">
+                            <div></div>
+                            <button class="btn btn-primary btn-lg" id="step1NextBtn">Next: Domain & Role →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: CONDITIONAL TECHNICAL DOMAIN & OPTIONAL JOB ROLE -->
+                    <div class="wizard-step" id="wizardStep2" style="display: none;">
+                        <div class="step-heading">
+                            <h3>Step 2: Domain & Optional Job Role</h3>
+                            <p class="text-secondary">Configure technical focus and optional role context. Job Role is strictly optional.</p>
+                        </div>
+
+                        <!-- Technical Subject Group (Conditional) -->
+                        <div class="form-group" id="setupSubjectGroup">
+                            <label class="form-label" for="setupSubjectSelect">Technical Domain / Subject</label>
+                            <select id="setupSubjectSelect" class="form-select">
+                                <option value="Java" selected>Java (Collections, JVM, Memory, OOP, Concurrency)</option>
+                                <option value="Python">Python (GIL, Generators, Decorators, OOP, Memory)</option>
+                                <option value="C">C (Pointers, Memory Layout, Malloc/Free, Structs)</option>
+                                <option value="C++">C++ (STL, Templates, Virtual Functions, RAII)</option>
+                                <option value="DSA">DSA (Trees, Graphs, Sorting, Dynamic Programming)</option>
+                                <option value="DBMS / SQL">DBMS / SQL (Indexes, Normalization, Joins, ACID)</option>
+                                <option value="Operating Systems">Operating Systems (Processes, Deadlocks, Paging, CPU)</option>
+                                <option value="Computer Networks">Computer Networks (TCP/IP, OSI, DNS, HTTP/HTTPS)</option>
+                                <option value="OOP">OOP (Inheritance, Polymorphism, Encapsulation, SOLID)</option>
+                                <option value="System Design">System Design (Load Balancing, Caching, Scaling)</option>
+                                <option value="General">Other / General Technical (Balanced CS Topics)</option>
+                            </select>
+                            <span class="form-hint" id="subjectHintText">Questions will strictly address this technical subject.</span>
+                        </div>
+
+                        <!-- Optional Job Role -->
+                        <div class="form-group">
+                            <label class="form-label" for="setupRoleSelect">Job Role (Optional Context)</label>
+                            <select id="setupRoleSelect" class="form-select">
+                                <option value="None" selected>[ None / Select Job Role ▼ ]</option>
+                                <option value="Java Developer">Java Developer</option>
+                                <option value="Backend Developer">Backend Developer</option>
+                                <option value="Full Stack Developer">Full Stack Developer</option>
+                                <option value="Software Engineer">Software Engineer</option>
+                                <option value="Data Analyst">Data Analyst</option>
+                                <option value="QA Engineer">QA Engineer</option>
+                            </select>
+                            <span class="form-hint">Job Role is optional. If left as None, questions are generated purely from your selected mode and domain.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="setupDifficultySelect">Difficulty Level</label>
+                            <select id="setupDifficultySelect" class="form-select">
+                                <option value="Easy">Easy (Core Concepts & Fundamentals)</option>
+                                <option value="Medium" selected>Medium (Standard Interview Depth)</option>
+                                <option value="Hard">Hard (Deep Architecture & Edge Cases)</option>
+                            </select>
+                        </div>
+
+                        <div class="wizard-nav-row">
+                            <button class="btn btn-outline" id="step2BackBtn">← Back</button>
+                            <button class="btn btn-primary btn-lg" id="step2NextBtn">Next: Question Count →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: QUESTION COUNT -->
+                    <div class="wizard-step" id="wizardStep3" style="display: none;">
+                        <div class="step-heading">
+                            <h3>Step 3: Select Question Count</h3>
+                            <p class="text-secondary">Choose the exact number of main interview questions (1, 3, 5, or 7).</p>
+                        </div>
+
+                        <div class="question-count-cards-grid">
+                            <label class="q-count-card" data-count="1">
+                                <input type="radio" name="questionCountRadio" value="1" style="display: none;">
+                                <div class="q-count-number">1</div>
+                                <h4>Single Question</h4>
+                                <p>Fast practice with immediate transcription and evaluation.</p>
+                                <span class="q-count-tag">Quick Test</span>
+                            </label>
+                            <label class="q-count-card" data-count="3">
+                                <input type="radio" name="questionCountRadio" value="3" style="display: none;">
+                                <div class="q-count-number">3</div>
+                                <h4>3 Questions</h4>
+                                <p>Focused short practice session.</p>
+                                <span class="q-count-tag">Practice</span>
+                            </label>
+                            <label class="q-count-card selected" data-count="5">
+                                <input type="radio" name="questionCountRadio" value="5" checked style="display: none;">
+                                <div class="q-count-number">5</div>
+                                <h4>5 Questions</h4>
+                                <p>Standard interview session covering key topics.</p>
+                                <span class="q-count-tag">Recommended</span>
+                            </label>
+                            <label class="q-count-card" data-count="7">
+                                <input type="radio" name="questionCountRadio" value="7" style="display: none;">
+                                <div class="q-count-number">7</div>
+                                <h4>7 Questions</h4>
+                                <p>In-depth mock interview with thorough coverage.</p>
+                                <span class="q-count-tag">Comprehensive</span>
+                            </label>
+                        </div>
+                        <input type="hidden" id="setupQuestionsCountSelect" value="5">
+
+                        <div class="wizard-nav-row">
+                            <button class="btn btn-outline" id="step3BackBtn">← Back</button>
+                            <button class="btn btn-primary btn-lg" id="step3NextBtn">Next: Resume →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: RESUME UPLOAD -->
+                    <div class="wizard-step" id="wizardStep4" style="display: none;">
+                        <div class="step-heading">
+                            <h3>Step 4: Resume Attachment</h3>
+                            <p class="text-secondary" id="resumeStepNotice">Required for Resume-Based interviews; optional for other modes.</p>
+                        </div>
+
+                        <div class="resume-upload-wrapper">
+                            <div class="resume-drop-zone" id="resumeDropZone">
+                                <input type="file" id="resumeFileInput" accept=".pdf,.docx" style="display: none;">
+                                <div class="drop-zone-icon">📄</div>
+                                <div class="drop-zone-text">
+                                    <strong id="resumeDropPrompt">Click or Drag & Drop your Resume (.PDF or .DOCX)</strong>
+                                    <span>Extracts candidate name, education, skills, and projects</span>
+                                </div>
+                            </div>
+
+                            <!-- Resume Loaded State -->
+                            <div id="resumeLoadedInfo" class="resume-loaded-card" style="display: none;">
+                                <div class="resume-file-header">
+                                    <span class="file-icon">✅</span>
+                                    <span id="resumeLoadedName" class="file-name">resume.pdf</span>
+                                    <button id="removeResumeBtn" type="button" class="btn btn-sm btn-danger">Remove</button>
+                                </div>
+                                <div id="resumeCandidateDetected" class="candidate-detected-tag" style="display: none;"></div>
+                                <div id="resumeSummaryText" class="resume-summary-text"></div>
+                                <div id="resumeSkillsTags" class="tag-cloud"></div>
+                            </div>
+                        </div>
+
+                        <div class="wizard-nav-row">
+                            <button class="btn btn-outline" id="step4BackBtn">← Back</button>
+                            <button class="btn btn-primary btn-lg" id="step4NextBtn">Next: Review & Start →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: REVIEW & SUMMARY -->
+                    <div class="wizard-step" id="wizardStep5" style="display: none;">
+                        <div class="step-heading">
+                            <h3>Step 5: Session Summary</h3>
+                            <p class="text-secondary">Confirm your configuration before launching your interview session.</p>
+                        </div>
+
+                        <div class="summary-preview-card">
+                            <div class="summary-item">
+                                <span class="summary-label">Interview Mode:</span>
+                                <span class="summary-value" id="summaryMode">Technical</span>
+                            </div>
+                            <div class="summary-item" id="summarySubjectRow">
+                                <span class="summary-label">Technical Domain:</span>
+                                <span class="summary-value" id="summarySubject">Java</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Job Role:</span>
+                                <span class="summary-value" id="summaryRole">None</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Question Count:</span>
+                                <span class="summary-value" id="summaryQuestions">5 Questions</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Difficulty:</span>
+                                <span class="summary-value" id="summaryDifficulty">Medium</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Resume Attachment:</span>
+                                <span class="summary-value" id="summaryResume">Not Attached (Optional)</span>
+                            </div>
+                        </div>
+
+                        <div class="wizard-nav-row">
+                            <button class="btn btn-outline" id="step5BackBtn">← Back</button>
+                            <button class="btn btn-primary btn-lg" id="startSessionBtn">
+                                🚀 Start Interview
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 3: ACTIVE INTERVIEW SCREEN
+                 ============================================================ -->
+            <section id="viewInterview" class="app-view">
+                <!-- Top Session Header Bar -->
+                <div class="session-header-bar">
+                    <div class="session-meta">
+                        <span class="badge badge-primary" id="sessionModeBadge">Technical</span>
+                        <span class="badge badge-secondary" id="sessionSubjectBadge" style="display: none;">Java</span>
+                        <span class="badge badge-outline" id="sessionRoleBadge">None</span>
+                        <span class="badge badge-outline" id="sessionDifficultyBadge">Medium</span>
+                    </div>
+                    <div class="session-progress-wrap">
+                        <div class="progress-label-row">
+                            <span class="progress-q-number" id="sessionProgressNumber">Question 1 of 5</span>
+                            <span class="progress-timer" id="sessionTimer">⏱️ 00:00</span>
+                        </div>
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" id="sessionProgressBar" style="width: 20%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Follow-Up Alert Banner -->
+                <div id="followUpBanner" class="follow-up-banner" style="display: none;">
+                    <div class="banner-badge">✨ Dynamic Follow-Up Question</div>
+                    <p id="followUpReasonText">Based on your answer, let's explore this deeper:</p>
+                </div>
+
+                <!-- Main Question Display Card -->
+                <div class="card question-card">
+                    <div class="question-header-row">
+                        <span class="question-pill" id="questionTypePill">Main Question</span>
+                        <span class="question-traceability" id="questionTraceability">Technical Domain: Java</span>
+                    </div>
+                    <h2 class="interview-question-text" id="interviewQuestionText">
+                        Loading your interview question...
+                    </h2>
+                    <div class="question-footer-row">
+                        <button class="btn btn-sm btn-outline" id="copyQuestionBtn">📋 Copy Question</button>
+                    </div>
+                </div>
+
+                <!-- Media Response & Recording Area -->
+                <div class="response-container">
+                    <!-- Left: Camera Preview & Controls -->
+                    <div class="card recording-card">
+                        <div class="card-header">
+                            <h3>🎥 Answer Recording Panel</h3>
+                            <span class="recording-status-badge" id="recStatusBadge">Ready</span>
+                        </div>
+
+                        <!-- Live Camera Preview Box -->
+                        <div class="camera-preview-container">
+                            <video id="previewVideo" autoplay muted playsinline class="camera-video"></video>
+                            <div class="camera-placeholder" id="cameraPlaceholder">
+                                <div class="cam-icon">📹</div>
+                                <span>Click "Start Recording" to activate your camera and microphone</span>
+                            </div>
+                            <div class="recording-live-indicator" id="recLiveIndicator" style="display: none;">
+                                <span class="blink-dot"></span> REC <span id="recordingTimer">00:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="recording-actions">
+                            <button id="startRecordingBtn" class="btn btn-primary btn-lg">
+                                ⏺ Start Recording
+                            </button>
+                            <button id="stopRecordingBtn" class="btn btn-danger btn-lg" style="display: none;">
+                                ⏹ Stop & Submit Answer
+                            </button>
+                        </div>
+
+                        <!-- Secondary File Upload alternative -->
+                        <div class="alt-upload-divider">
+                            <span>— or submit an audio/video file —</span>
+                        </div>
+                        <div class="drag-drop-zone" id="dragDropZone">
+                            <input type="file" id="fileInput" accept=".mp4,.mov,.webm,.mp3,.wav,.m4a" style="display: none;">
+                            <div class="drop-zone-text">
+                                <strong id="dragDropPrompt">Click or drop recorded media (.webm, .mp4, .wav, .mp3)</strong>
+                                <span class="text-secondary" id="selectedFileNameDisplay">Maximum size: 50MB</span>
+                            </div>
+                        </div>
+                        <button id="analyzeBtn" class="btn btn-secondary w-full" style="display: none; margin-top: 10px;">
+                            <span id="analyzeBtnText">Analyze Uploaded File</span>
+                        </button>
+                    </div>
+
+                    <!-- Right: Question Tips & Guidelines -->
+                    <div class="card tips-card">
+                        <h3>💡 Best Practice Answering Tips</h3>
+                        <div class="tip-item">
+                            <span class="tip-num">1</span>
+                            <div>
+                                <strong>Clear Structure:</strong> State your key technical concept first, then explain the implementation details and tradeoffs.
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-num">2</span>
+                            <div>
+                                <strong>Maintain Eye Contact:</strong> Look toward your camera lens to simulate looking directly at your interviewer.
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-num">3</span>
+                            <div>
+                                <strong>Pacing & Clarity:</strong> Aim for a steady 120–160 WPM pace. Avoid rushed answers or frequent filler pauses.
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-num">4</span>
+                            <div>
+                                <strong>Specific Depth:</strong> Address exact methods, data structures, or engineering choices rather than high-level generalizations.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 4: PROCESSING / EVALUATION STATE
+                 ============================================================ -->
+            <section id="viewProcessing" class="app-view">
+                <div class="processing-card card">
+                    <div class="processing-spinner"></div>
+                    <h2>Evaluating Your Interview Answer</h2>
+                    <p class="processing-subtitle" id="processingStatusSubtitle">Please wait while our models analyze your spoken answer and video feed...</p>
+
+                    <div class="processing-steps">
+                        <div class="step-item" id="stepUpload">
+                            <span class="step-icon">📤</span>
+                            <span class="step-name">Uploading audio/video stream</span>
+                        </div>
+                        <div class="step-item" id="stepTranscribe">
+                            <span class="step-icon">🎙️</span>
+                            <span class="step-name">Faster-Whisper speech transcription</span>
+                        </div>
+                        <div class="step-item" id="stepVideo">
+                            <span class="step-icon">👁️</span>
+                            <span class="step-name">Facial gaze, eye contact & look-away analysis</span>
+                        </div>
+                        <div class="step-item" id="stepComm">
+                            <span class="step-icon">📊</span>
+                            <span class="step-name">Speech rate (WPM) & filler-word quantification</span>
+                        </div>
+                        <div class="step-item" id="stepEval">
+                            <span class="step-icon">🧠</span>
+                            <span class="step-name">AI evaluation & question progression</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 5: RESULTS SCREEN
+                 ============================================================ -->
+            <section id="viewResults" class="app-view">
+                <!-- Session Complete Summary Banner -->
+                <div class="results-banner">
+                    <div class="results-banner-main">
+                        <span class="banner-pill" id="resultSessionType">Session Completed</span>
+                        <h1 id="resultSessionTitle">Interview Session Complete!</h1>
+                        <p id="resultSessionSubtitle">Here is your comprehensive evaluation across all answered questions.</p>
+                        <div class="results-banner-actions">
+                            <button class="btn btn-primary btn-lg" id="downloadSessionPdfBtn">
+                                📥 Download Full PDF Report
+                            </button>
+                            <button class="btn btn-secondary btn-lg" id="resultsNewInterviewBtn">
+                                🔄 Practice Again
+                            </button>
+                            <button class="btn btn-outline btn-lg" id="resultsBackDashboardBtn">
+                                🏠 Return to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                    <div class="results-score-box">
+                        <div class="score-ring-wrap">
+                            <span class="ring-label">Overall Score</span>
+                            <div class="ring-val" id="resultOverallScore">0</div>
+                            <span class="ring-denom">/ 100</span>
+                        </div>
+                        <div class="readiness-box">
+                            <span class="readiness-tag">Interview Readiness</span>
+                            <div class="readiness-score-val" id="resultReadinessScore">0 / 100</div>
+                            <span class="readiness-badge" id="resultReadinessLevel">Developing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Dimension Cards -->
+                <div class="scores-four-grid">
+                    <div class="score-box-card">
+                        <div class="score-box-header">
+                            <span class="dim-label">Technical Score</span>
+                            <span class="dim-val" id="resTechScore">0/10</span>
+                        </div>
+                        <div class="dim-bar"><div class="dim-bar-fill" id="resTechBar"></div></div>
+                        <span class="dim-hint">Correctness & domain depth</span>
+                    </div>
+
+                    <div class="score-box-card">
+                        <div class="score-box-header">
+                            <span class="dim-label">Communication Score</span>
+                            <span class="dim-val" id="resCommScore">0/10</span>
+                        </div>
+                        <div class="dim-bar"><div class="dim-bar-fill" id="resCommBar"></div></div>
+                        <span class="dim-hint">Clarity & pacing</span>
+                    </div>
+
+                    <div class="score-box-card">
+                        <div class="score-box-header">
+                            <span class="dim-label">Problem Solving</span>
+                            <span class="dim-val" id="resProbScore">0/10</span>
+                        </div>
+                        <div class="dim-bar"><div class="dim-bar-fill" id="resProbBar"></div></div>
+                        <span class="dim-hint">Reasoning & logic</span>
+                    </div>
+
+                    <div class="score-box-card">
+                        <div class="score-box-header">
+                            <span class="dim-label">Delivery & Confidence</span>
+                            <span class="dim-val" id="resConfScore">0/10</span>
+                        </div>
+                        <div class="dim-bar"><div class="dim-bar-fill" id="resConfBar"></div></div>
+                        <span class="dim-hint">Gaze stability & posture</span>
+                    </div>
+                </div>
+
+                <!-- Communication & Video Metrics Row -->
+                <div class="metrics-two-grid">
+                    <!-- Communication Analysis -->
+                    <div class="card metric-panel-card">
+                        <div class="card-header">
+                            <h3>🗣️ Communication Analysis</h3>
+                            <span class="badge badge-secondary" id="commPacingBadge">Optimal Pace</span>
+                        </div>
+                        <div class="metric-tiles-row">
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resWpm">0</span>
+                                <span class="tile-caption">Words Per Minute</span>
+                            </div>
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resSpeechDuration">0s</span>
+                                <span class="tile-caption">Speaking Duration</span>
+                            </div>
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resFillerCount">0</span>
+                                <span class="tile-caption">Filler Words (um/uh)</span>
+                            </div>
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resFillerRate">0.0 /min</span>
+                                <span class="tile-caption">Filler Rate</span>
+                            </div>
+                        </div>
+                        <div class="comm-guideline-note">
+                            <strong>Note on evaluation:</strong> Communication analysis is strictly based on objective speech rate and filler frequency. Accent or regional pronunciation is never penalized.
+                        </div>
+                    </div>
+
+                    <!-- Video Analysis Card -->
+                    <div class="card metric-panel-card">
+                        <div class="card-header">
+                            <h3>👁️ Video Gaze & Stability Analysis</h3>
+                            <span class="badge badge-secondary" id="videoGazeBadge">Engaged</span>
+                        </div>
+                        <div class="metric-tiles-row">
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resFaceVisible">--%</span>
+                                <span class="tile-caption">Face Visible</span>
+                            </div>
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resLookAwayCount">0</span>
+                                <span class="tile-caption">Look-Away Events</span>
+                            </div>
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resEyeContact">--/10</span>
+                                <span class="tile-caption">Eye Contact</span>
+                            </div>
+                            <div class="metric-tile">
+                                <span class="tile-number" id="resHeadStability">--/10</span>
+                                <span class="tile-caption">Head Stability</span>
+                            </div>
+                        </div>
+
+                        <!-- Look-Away Timeline (Evidence-Based) -->
+                        <div id="resLookAwayTimelineContainer" class="look-away-timeline-wrap">
+                            <span class="timeline-title">Look-Away Timeline:</span>
+                            <div id="resLookAwayEvents" class="timeline-event-chips">
+                                <span class="text-secondary" style="font-size: 0.85rem;">No look-away events detected.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strengths & Weaknesses -->
+                <div class="feedback-three-grid">
+                    <div class="card feedback-card card-strengths">
+                        <div class="card-header"><h3>✅ Strengths</h3></div>
+                        <div class="card-content" id="resStrengthsList">
+                            <p class="text-secondary">Analysis pending...</p>
+                        </div>
+                    </div>
+
+                    <div class="card feedback-card card-weaknesses">
+                        <div class="card-header"><h3>⚠️ Areas to Improve</h3></div>
+                        <div class="card-content" id="resWeaknessesList">
+                            <p class="text-secondary">Analysis pending...</p>
+                        </div>
+                    </div>
+
+                    <div class="card feedback-card card-suggestions">
+                        <div class="card-header"><h3>🚀 Practical Suggestions</h3></div>
+                        <div class="card-content" id="resSuggestionsList">
+                            <p class="text-secondary">Analysis pending...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question-by-Question Detailed Breakdown -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2>Question-Wise Performance</h2>
+                        <span class="section-subtitle">Review your transcript, feedback, and ideal answers for each question</span>
+                    </div>
+                    <div id="questionBreakdownList" class="breakdown-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 6: RESUME ANALYSIS VIEW
+                 ============================================================ -->
+            <section id="viewResume" class="app-view">
+                <div class="page-title-row">
+                    <div>
+                        <h2>Resume Analysis & Skill Gaps</h2>
+                        <p class="text-secondary">Detailed extraction of your resume skills, strengths, and role-aware gap analysis</p>
+                    </div>
+                    <button class="btn btn-primary" id="resumeUploadNewBtn">+ Upload New Resume</button>
+                </div>
+
+                <div class="resume-view-grid">
+                    <!-- Left Column: Extracted Candidate Data -->
+                    <div class="card resume-detail-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 id="resViewCandidateName">Candidate Resume</h3>
+                                <span class="text-secondary" id="resViewFileName">No file loaded</span>
+                            </div>
+                        </div>
+
+                        <!-- Candidate Contact Info -->
+                        <div id="resContactInfo" class="resume-contact-bar" style="display: none;"></div>
+
+                        <!-- Education Section -->
+                        <div class="resume-section-box">
+                            <div class="resume-section-title">
+                                <span class="sec-icon">🎓</span>
+                                <h4>Education</h4>
+                            </div>
+                            <div id="resEducationContainer" class="resume-item-stack">
+                                <div class="text-secondary italic-empty">No education details detected in the uploaded resume.</div>
+                            </div>
+                        </div>
+
+                        <!-- Categorized Skills Section (All 9 Canonical Categories) -->
+                        <div class="resume-section-box">
+                            <div class="resume-section-title">
+                                <span class="sec-icon">⚡</span>
+                                <h4>Categorized Skills</h4>
+                            </div>
+                            <div id="resCategorizedSkillsContainer">
+                                <div class="text-secondary italic-empty">No skills detected in the uploaded resume.</div>
+                            </div>
+                        </div>
+
+                        <!-- Extracted Projects Section -->
+                        <div class="resume-section-box">
+                            <div class="resume-section-title">
+                                <span class="sec-icon">📂</span>
+                                <h4>Projects</h4>
+                            </div>
+                            <div id="resProjectsContainer" class="resume-item-stack">
+                                <div class="text-secondary italic-empty">No projects detected in the uploaded resume.</div>
+                            </div>
+                        </div>
+
+                        <!-- Internships / Work Experience Section -->
+                        <div class="resume-section-box">
+                            <div class="resume-section-title">
+                                <span class="sec-icon">💼</span>
+                                <h4>Internships & Experience</h4>
+                            </div>
+                            <div id="resExperienceContainer" class="resume-item-stack">
+                                <div class="text-secondary italic-empty">No internship experience detected in the uploaded resume.</div>
+                            </div>
+                        </div>
+
+                        <!-- Certifications Section -->
+                        <div class="resume-section-box">
+                            <div class="resume-section-title">
+                                <span class="sec-icon">📜</span>
+                                <h4>Certifications</h4>
+                            </div>
+                            <div id="resCertificationsContainer" class="resume-item-stack">
+                                <div class="text-secondary italic-empty">No certifications detected in the uploaded resume.</div>
+                            </div>
+                        </div>
+
+                        <!-- Achievements Section -->
+                        <div class="resume-section-box">
+                            <div class="resume-section-title">
+                                <span class="sec-icon">🏆</span>
+                                <h4>Achievements</h4>
+                            </div>
+                            <div id="resAchievementsContainer" class="resume-item-stack">
+                                <div class="text-secondary italic-empty">No achievements detected in the uploaded resume.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Role-Aware Gap Analysis & Insights -->
+                    <div class="card resume-detail-card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Role-Aware Gap Analysis</h3>
+                                <span class="text-secondary">Analyze resume coverage against standard role expectations</span>
+                            </div>
+                        </div>
+
+                        <!-- Role Selector for Real-Time Gap Recalculation -->
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label" for="resGapRoleSelect">Target Job Role to Evaluate Against:</label>
+                            <select id="resGapRoleSelect" class="form-select">
+                                <option value="Software Engineer" selected>Software Engineer</option>
+                                <option value="Java Developer">Java Developer</option>
+                                <option value="Backend Developer">Backend Developer</option>
+                                <option value="Full Stack Developer">Full Stack Developer</option>
+                                <option value="Data Analyst">Data Analyst</option>
+                                <option value="QA Engineer">QA Engineer</option>
+                            </select>
+                        </div>
+
+                        <div class="gap-analysis-section">
+                            <h4>Potential Skill Gaps</h4>
+                            <div id="resGapsList" class="gap-cards-container">
+                                <p class="text-secondary">Upload a resume to inspect skill gaps.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvements-section" style="margin-top: 1.5rem;">
+                            <h4>Resume Strengths</h4>
+                            <ul id="resStrengthsList" class="insight-list">
+                                <li class="text-secondary">Strengths will appear here based on your uploaded resume.</li>
+                            </ul>
+                        </div>
+
+                        <div class="improvements-section" style="margin-top: 1.5rem;">
+                            <h4>Recommended Improvements</h4>
+                            <ul id="resImprovementsList" class="insight-list">
+                                <li class="text-secondary">Actionable tips will appear here based on your uploaded resume.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 VIEW 7: INTERVIEW HISTORY
+                 ============================================================ -->
+            <section id="viewHistory" class="app-view">
+                <div class="page-title-row">
+                    <div>
+                        <h2>Interview Session History</h2>
+                        <p class="text-secondary">All your previous practice sessions saved in MySQL with isolated user access</p>
+                    </div>
+                    <button class="btn btn-primary" id="historyStartNewBtn">+ Start New Interview</button>
+                </div>
+
+                <div class="card history-table-card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Session ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Mode</th>
+                                    <th>Subject / Domain</th>
+                                    <th>Job Role</th>
+                                    <th>Questions</th>
+                                    <th>Score</th>
+                                    <th>Readiness</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="10" class="empty-state">Loading your interview history...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /.container -->
+    </main>
+
+    <!-- ================================================================
+         SESSION DETAIL MODAL
+         ================================================================ -->
+    <div id="detailModal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalSessionTitle">Interview Session Details</h3>
+                    <span class="modal-sub" id="modalSessionSub">Session ID: #--</span>
+                </div>
+                <button class="modal-close-btn" id="closeDetailModalBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalSessionBody">
+                <!-- Populated dynamically with full question-by-question cards -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="modalCloseBtn">Close</button>
+                <button class="btn btn-primary" id="modalDownloadPdfBtn">📥 Download Session PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         AUTHENTICATION MODAL (LOGIN / REGISTER)
+         ================================================================ -->
+    <div id="authModal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card modal-auth">
+            <div class="modal-header">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="authTabLogin">Sign In</button>
+                    <button class="auth-tab" id="authTabRegister">Create Account</button>
+                </div>
+                <button class="modal-close-btn" id="closeAuthModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Error Banner in Modal -->
+                <div id="authErrorBanner" class="alert-banner alert-danger" style="display: none;"></div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="candidate@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">Password</label>
+                        <div class="password-input-wrap">
+                            <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+                            <button type="button" class="btn-pwd-toggle" id="loginTogglePwdBtn">Show</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full" id="loginSubmitBtn">
+                        Sign In
+                    </button>
+                </form>
+
+                <!-- Registration Form -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="regName">Full Name</label>
+                        <input type="text" id="regName" class="form-input" placeholder="Your Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" class="form-input" placeholder="candidate@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="regPassword">Password (6+ characters)</label>
+                        <div class="password-input-wrap">
+                            <input type="password" id="regPassword" class="form-input" placeholder="••••••••" minlength="6" required>
+                            <button type="button" class="btn-pwd-toggle" id="regTogglePwdBtn">Show</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="regConfirmPassword">Confirm Password</label>
+                        <input type="password" id="regConfirmPassword" class="form-input" placeholder="••••••••" minlength="6" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full" id="regSubmitBtn">
+                        Create Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 AI Interview Coach. Built with Faster-Whisper, OpenCV, Google Gemini & MySQL.</p>
+            <div class="footer-badges">
+                <span class="f-badge">MySQL Backed</span>
+                <span class="f-badge">Strict User Isolation</span>
+                <span class="f-badge">Evidence-Based Video Analysis</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
