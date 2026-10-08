@@ -36,58 +36,66 @@ def get_database_url() -> str:
 
 DATABASE_URL = get_database_url()
 
-# Create SQLAlchemy Engine
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-    pool_recycle=3600,
-    pool_size=10,
-    max_overflow=20,
-    echo=False,
-)
+# Create SQLAlchemy Engine (supports both MySQL and SQLite)
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        echo=False,
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        pool_size=10,
+        max_overflow=20,
+        echo=False,
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
-    """Create all tables in MySQL if they do not already exist, and ensure schema migrations."""
+    """Create all tables if they do not already exist, and ensure schema migrations."""
     try:
         import models  # Ensure all models are registered
         Base.metadata.create_all(bind=engine)
 
-        # Ensure new schema columns exist in existing tables
-        with engine.connect() as conn:
-            def add_column_if_not_exists(table, column, col_type):
-                sql = text(f"""
-                    SELECT COUNT(*) FROM information_schema.COLUMNS 
-                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{table}' AND COLUMN_NAME = '{column}'
-                """)
-                exists = conn.execute(sql).scalar()
-                if not exists:
-                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}"))
+        if engine.name == "mysql":
+            # Ensure new schema columns exist in existing tables
+            with engine.connect() as conn:
+                def add_column_if_not_exists(table, column, col_type):
+                    sql = text(f"""
+                        SELECT COUNT(*) FROM information_schema.COLUMNS 
+                        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{table}' AND COLUMN_NAME = '{column}'
+                    """)
+                    exists = conn.execute(sql).scalar()
+                    if not exists:
+                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}"))
+                        conn.commit()
+
+                add_column_if_not_exists("interview_sessions", "technical_subject", "VARCHAR(80) NULL")
+                add_column_if_not_exists("session_questions", "technical_subject", "VARCHAR(80) NULL")
+                add_column_if_not_exists("session_questions", "source_type", "VARCHAR(50) NULL")
+                add_column_if_not_exists("session_questions", "source_reference", "VARCHAR(255) NULL")
+                add_column_if_not_exists("resume_metadata", "candidate_name", "VARCHAR(120) NULL")
+                add_column_if_not_exists("resume_metadata", "certifications", "JSON NULL")
+                add_column_if_not_exists("resume_metadata", "skill_gaps", "JSON NULL")
+                add_column_if_not_exists("resume_metadata", "resume_strengths", "JSON NULL")
+                add_column_if_not_exists("resume_metadata", "recommended_improvements", "JSON NULL")
+                add_column_if_not_exists("resume_metadata", "achievements", "JSON NULL")
+                add_column_if_not_exists("resume_metadata", "structured_skills", "JSON NULL")
+
+                # Ensure role columns are nullable in existing tables
+                try:
+                    conn.execute(text("ALTER TABLE interview_sessions MODIFY COLUMN `role` VARCHAR(100) NULL"))
+                    conn.execute(text("ALTER TABLE session_questions MODIFY COLUMN `role` VARCHAR(100) NULL"))
                     conn.commit()
+                except Exception as e:
+                    logger.warning("Notice on altering role nullable: %s", e)
 
-            add_column_if_not_exists("interview_sessions", "technical_subject", "VARCHAR(80) NULL")
-            add_column_if_not_exists("session_questions", "technical_subject", "VARCHAR(80) NULL")
-            add_column_if_not_exists("session_questions", "source_type", "VARCHAR(50) NULL")
-            add_column_if_not_exists("session_questions", "source_reference", "VARCHAR(255) NULL")
-            add_column_if_not_exists("resume_metadata", "candidate_name", "VARCHAR(120) NULL")
-            add_column_if_not_exists("resume_metadata", "certifications", "JSON NULL")
-            add_column_if_not_exists("resume_metadata", "skill_gaps", "JSON NULL")
-            add_column_if_not_exists("resume_metadata", "resume_strengths", "JSON NULL")
-            add_column_if_not_exists("resume_metadata", "recommended_improvements", "JSON NULL")
-            add_column_if_not_exists("resume_metadata", "achievements", "JSON NULL")
-            add_column_if_not_exists("resume_metadata", "structured_skills", "JSON NULL")
-
-            # Ensure role columns are nullable in existing tables
-            try:
-                conn.execute(text("ALTER TABLE interview_sessions MODIFY COLUMN `role` VARCHAR(100) NULL"))
-                conn.execute(text("ALTER TABLE session_questions MODIFY COLUMN `role` VARCHAR(100) NULL"))
-                conn.commit()
-            except Exception as e:
-                logger.warning("Notice on altering role nullable: %s", e)
-
-        logger.info("Database tables and schema columns verified/created successfully in MySQL.")
+        logger.info("Database tables and schema columns verified/created successfully in %s.", engine.name)
     except Exception as e:
         logger.exception("Failed to initialize database tables: %s", e)
         raise

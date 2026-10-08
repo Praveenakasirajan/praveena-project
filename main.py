@@ -26,6 +26,7 @@ import time
 from typing import Dict, Optional, Tuple
 
 from fastapi import Body, Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from faster_whisper import WhisperModel
@@ -234,6 +235,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AI Interview Coach", lifespan=lifespan)
+
+# CORS middleware for cross-origin deployment (e.g., Vercel frontend + Render backend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount static files
 static_dir = BASE_DIR / "static"
